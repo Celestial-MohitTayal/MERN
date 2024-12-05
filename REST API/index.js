@@ -8,6 +8,23 @@ const PORT = 8000;
 //Middleware - Plugin
 app.use(express.urlencoded({ extended: false }));
 
+app.use((req, res, next) => {
+  fs.appendFile('log.txt', `\n${Date.now()}: ${req.method}: ${req.path}\n`, (err, data) => next());
+
+})
+
+// app.use((req, res, next) => {
+//   console.log('Hello from Middleware 1');
+//   req.myUsername = "tayalmohit0103"
+//   next();
+// })
+
+// app.use((req, res, next) => {
+//   console.log('Hello from Middleware 2 -', req.myUsername);
+//   // return res.end('Hey');
+//   next();
+// })
+
 app.get("/users", (req, res) => {
   const html = `
     <ul>
@@ -20,6 +37,7 @@ app.get("/users", (req, res) => {
 });
 
 app.get("/api/users", (req, res) => {
+  // console.log('Hey i am in get route -', req.myUsername);
   return res.json(users);
 });
 

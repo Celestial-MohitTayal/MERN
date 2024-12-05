@@ -1,0 +1,12 @@
+
+1733395222869: GET: /api/users
+
+1733395226751: POST: /api/users
+
+1733395234133: GET: /api/users
+
+1733395236790: PATCH: /api/users/1000
+
+1733395241360: DELETE: /api/users/1000
+
+1733395243532: GET: /api/users
