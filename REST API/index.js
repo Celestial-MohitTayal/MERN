@@ -9,9 +9,12 @@ const PORT = 8000;
 app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
-  fs.appendFile('log.txt', `\n${Date.now()}: ${req.method}: ${req.path}\n`, (err, data) => next());
-
-})
+  fs.appendFile(
+    "log.txt",
+    `\n${Date.now()}: ${req.method}: ${req.path}\n`,
+    (err, data) => next()
+  );
+});
 
 // app.use((req, res, next) => {
 //   console.log('Hello from Middleware 1');
