@@ -3,9 +3,16 @@ const express = require("express");
 const fs = require("fs");
 const axios = require("axios");
 const path = require("path");
+const cors = require('cors');
 
 const app = express();
 const port = 5000;
+
+// Middleware to parse JSON in request body
+app.use(express.json());
+
+// Middleware To resolve error related to cors (access-control-allow-origin)
+app.use(cors());
 
 // File Path Variable using path library
 const usersFilePath = path.join(__dirname, "users.json");
@@ -55,9 +62,9 @@ app.put("/users/:id", (req, res) => {
   const users = getUsers();
   const userId = parseInt(req.params.id);
   const userIndex = users.findIndex((user) => user.id === userId);
-
   if (userIndex !== -1) {
     users[userIndex] = { ...users[userIndex], ...req.body }; //using spread operator to update the user data
+    // console.log(users[userIndex]);
     fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2)); // Save the updated list
     res.json(users[userIndex]);
   } else {
@@ -78,6 +85,16 @@ app.delete("/users/:id", (req, res) => {
     res.status(404).json({ error: "User not found" });
   }
 });
+
+// Route to search users by name 
+app.get("/users/search", (req, res) => {
+    const query = req.query.name.toLowerCase();
+    const users = getUsers();
+    const filteredUsers = users.filter((user) =>
+      user.name.toLowerCase().includes(query)
+    );
+    res.json(filteredUsers);
+  });
 
 // Start server
 app.listen(port, () => {
