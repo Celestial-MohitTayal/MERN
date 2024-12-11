@@ -7,9 +7,10 @@ import AddUserDialog from "./components/AddUserDialog";
 import EditUserDialog from "./components/EditUserDialog";
 
 const App = () => {
-  const [users, setUsers] = useState([]);   //List of Users
-  const [newUser, setNewUser] = useState({  //To add user
-    name: "", 
+  const [users, setUsers] = useState([]); //List of Users
+  const [newUser, setNewUser] = useState({
+    //To add user
+    name: "",
     email: "",
     address: { city: "" },
     phone: "",
@@ -17,8 +18,8 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState(null); //to edit user
   const [searchTerm, setSearchTerm] = useState(""); //to search user
   const [loading, setLoading] = useState(true); //until data fetchs
-  const [openDialog, setOpenDialog] = useState(false);  //add new user dialog/model
-  const [openEditDialog, setOpenEditDialog] = useState(false);  //edit dialog/model
+  const [openDialog, setOpenDialog] = useState(false); //add new user dialog/model
+  const [openEditDialog, setOpenEditDialog] = useState(false); //edit dialog/model
 
   useEffect(() => {
     axios
@@ -35,10 +36,10 @@ const App = () => {
 
   const addUser = () => {
     axios
-      .post("http://localhost:5000/users", newUser)
+      .post("http://localhost:5000/users", newUser) //payload - newUser
       .then((response) => {
-        setUsers([...users, response.data]);  //spread operator to update th data
-        setNewUser({ name: "", email: "", address: { city: "" }, phone: "" });  //removing new user data 
+        setUsers([...users, response.data]); //spread operator to update th data
+        setNewUser({ name: "", email: "", address: { city: "" }, phone: "" }); //removing new user data
         setOpenDialog(false);
       })
       .catch((error) => {
@@ -48,7 +49,7 @@ const App = () => {
 
   const editUser = (id) => {
     axios
-      .put(`http://localhost:5000/users/${id}`, currentUser)
+      .put(`http://localhost:5000/users/${id}`, currentUser) //payload - currentUser
       .then((response) => {
         setUsers(users.map((user) => (user.id === id ? response.data : user))); //replacing the new data for particular user with new data
         setOpenEditDialog(false);
@@ -79,7 +80,7 @@ const App = () => {
   };
 
   const openEditDialogHandler = (user) => {
-    setCurrentUser({ ...user });
+    setCurrentUser({ ...user }); //updating current user to display values in input
     setOpenEditDialog(true);
   };
 
