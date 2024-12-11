@@ -7,14 +7,15 @@ const path = require("path");
 const app = express();
 const port = 5000;
 
-
 // File Path Variable using path library
 const usersFilePath = path.join(__dirname, "users.json");
 
 // Fetch data and saving to file
 const fetchUsersFromApi = async () => {
   try {
-    const response = await axios.get("https://jsonplaceholder.typicode.com/users");
+    const response = await axios.get(
+      "https://jsonplaceholder.typicode.com/users"
+    );
     const users = response.data;
     fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2)); // Save to local file
   } catch (error) {
@@ -37,6 +38,45 @@ const getUsers = () => {
 app.get("/users", (req, res) => {
   const users = getUsers();
   res.json(users);
+});
+
+// Route to add a new user
+app.post("/users", (req, res) => {
+  const users = getUsers();
+  const newUser = req.body;
+  newUser.id = users.length + 1;
+  users.push(newUser);
+  fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+  res.status(201).json(newUser);
+});
+
+// Route to edit an existing user
+app.put("/users/:id", (req, res) => {
+  const users = getUsers();
+  const userId = parseInt(req.params.id);
+  const userIndex = users.findIndex((user) => user.id === userId);
+
+  if (userIndex !== -1) {
+    users[userIndex] = { ...users[userIndex], ...req.body }; //using spread operator to update the user data
+    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2)); // Save the updated list
+    res.json(users[userIndex]);
+  } else {
+    res.status(404).json({ error: "User not found" });
+  }
+});
+
+// Route to delete a user
+app.delete("/users/:id", (req, res) => {
+  const users = getUsers();
+  const userId = parseInt(req.params.id);
+  const newUsers = users.filter((user) => user.id !== userId);
+
+  if (newUsers.length !== users.length) {
+    fs.writeFileSync(usersFilePath, JSON.stringify(newUsers, null, 2)); // Save the updated list
+    res.status(200).json({ message: "User deleted" });
+  } else {
+    res.status(404).json({ error: "User not found" });
+  }
 });
 
 // Start server
