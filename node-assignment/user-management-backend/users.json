@@ -228,5 +228,23 @@
       "catchPhrase": "Centralized empowering task-force",
       "bs": "target end-to-end models"
     }
+  },
+  {
+    "name": "Mohit Tayal",
+    "email": "mohittayal@gmail.com",
+    "address": {
+      "city": "Hisar"
+    },
+    "phone": "86996-86065",
+    "id": 11
+  },
+  {
+    "name": "Rohit Tayal",
+    "email": "rohittayal@gmail.com",
+    "address": {
+      "city": "Bengaluru"
+    },
+    "phone": "70194-47173",
+    "id": 12
   }
 ]
