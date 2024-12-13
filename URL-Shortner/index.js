@@ -1,7 +1,6 @@
-const express = require("express");
-
 const { connectToMongoDB } = require("./connect");
-
+const express = require("express");
+const URL = require("./models/url");
 const urlRoute = require("./routes/url");
 
 const app = express();
@@ -13,8 +12,23 @@ connectToMongoDB("mongodb://localhost:27017/short-url").then(() =>
 
 app.use(express.json());
 
-app.use("/api", urlRoute)
+app.use("/", urlRoute);
 
-app.get("/", (req, res) => res.send("Hello From Mohit"))
+app.get("/:shortId", async (req, res) => {
+  const shortId = req.params.shortId;
+  const entry = await URL.findOneAndUpdate(
+    {
+      shortId,
+    },
+    {
+      $push: {
+        visitHistory: {
+          timestamp: Date.now(),
+        },
+      },
+    }
+  );
+  res.redirect(entry.redirectURL);
+});
 
 app.listen(PORT, () => console.log(`Server Started at PORT: ${PORT} `));
