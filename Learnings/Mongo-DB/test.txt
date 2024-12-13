@@ -1,0 +1,8 @@
+Schema - Define the Structure
+    Schema - Model
+    using model we do CRUD operations
+
+
+    commands:   mongosh
+                show dbs
+                use <dbname>
