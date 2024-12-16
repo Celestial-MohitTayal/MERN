@@ -2,11 +2,15 @@
 const express = require("express");
 const fs = require("fs");
 const axios = require("axios");
+const jwt = require("jsonwebtoken");
 const path = require("path");
 const cors = require('cors');
 
 const app = express();
 const port = 5000;
+// File Path Variable using path library
+const usersFilePath = path.join(__dirname, "users.json");
+const JWT_SECRET = "Mohit@123";
 
 // Middleware to parse JSON in request body
 app.use(express.json());
@@ -14,8 +18,6 @@ app.use(express.json());
 // Middleware To resolve error related to cors (access-control-allow-origin)
 app.use(cors());
 
-// File Path Variable using path library
-const usersFilePath = path.join(__dirname, "users.json");
 
 // Fetch data and saving to file
 const fetchUsersFromApi = async () => {
@@ -41,14 +43,41 @@ const getUsers = () => {
   return JSON.parse(data);
 };
 
+// Function to verify JWT token
+const authenticateToken = (req, res, next) => {
+  const token = req.header("Authorization")?.split(" ")[1]; // Bearer <token>
+  if (!token) return res.status(401).json({ error: "Access Denied" });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: "Invalid token" });
+    req.user = user;
+    next();
+  });
+};
+
 // Route to get all users
-app.get("/users", (req, res) => {
+app.get("/users", authenticateToken, (req, res) => {
   const users = getUsers();
   res.json(users);
 });
 
+// Login route to verify username and password, and generate JWT token
+app.post("/login", (req, res) => {
+  const { username } = req.body;
+  const users = getUsers();
+  const user = users.find((user) => user.username === username);
+  
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  // Generate JWT token
+  const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
+  res.json({ token });
+});
+
 // Route to add a new user
-app.post("/users", (req, res) => {
+app.post("/users", authenticateToken, (req, res) => {
   const users = getUsers();
   const newUser = req.body;
   newUser.id = users.length + 1;
@@ -58,7 +87,7 @@ app.post("/users", (req, res) => {
 });
 
 // Route to edit an existing user
-app.put("/users/:id", (req, res) => {
+app.put("/users/:id", authenticateToken, (req, res) => {
   const users = getUsers();
   const userId = parseInt(req.params.id);
   const userIndex = users.findIndex((user) => user.id === userId);
@@ -73,7 +102,7 @@ app.put("/users/:id", (req, res) => {
 });
 
 // Route to delete a user
-app.delete("/users/:id", (req, res) => {
+app.delete("/users/:id", authenticateToken, (req, res) => {
   const users = getUsers();
   const userId = parseInt(req.params.id);
   const newUsers = users.filter((user) => user.id !== userId);
@@ -87,7 +116,7 @@ app.delete("/users/:id", (req, res) => {
 });
 
 // Route to search users by name 
-app.get("/users/search", (req, res) => {
+app.get("/users/search", authenticateToken, (req, res) => {
     const query = req.query.name.toLowerCase();
     const users = getUsers();
     const filteredUsers = users.filter((user) =>

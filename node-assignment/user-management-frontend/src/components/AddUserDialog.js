@@ -13,6 +13,14 @@ const AddUserDialog = ({ openDialog, setOpenDialog, newUser, setNewUser, addUser
     <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
       <DialogTitle>Add New User</DialogTitle>
       <DialogContent>
+      <TextField
+          label="Username"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={newUser.username}
+          onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+        />
         <TextField
           label="Name"
           variant="outlined"
