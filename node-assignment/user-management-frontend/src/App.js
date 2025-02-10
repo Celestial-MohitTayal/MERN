@@ -52,11 +52,12 @@ const App = () => {
 
   const addUser = () => {
     axios
-      .post("http://localhost:5000/users", newUser, {   //payload - newUser
+      .post("http://localhost:5000/users", newUser, {
+        //payload - newUser
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      }) 
+      })
       .then((response) => {
         setUsers([...users, response.data]); //spread operator to update th data
         setNewUser({ name: "", email: "", address: { city: "" }, phone: "" }); //removing new user data
@@ -78,11 +79,12 @@ const App = () => {
 
   const editUser = (id) => {
     axios
-      .put(`http://localhost:5000/users/${id}`, currentUser, {  //payload - currentUser
+      .put(`http://localhost:5000/users/${id}`, currentUser, {
+        //payload - currentUser
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, 
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      }) 
+      })
       .then((response) => {
         setUsers(users.map((user) => (user.id === id ? response.data : user))); //replacing the new data for particular user with new data
         setOpenEditDialog(false);
@@ -96,7 +98,7 @@ const App = () => {
     axios
       .delete(`http://localhost:5000/users/${id}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, 
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
       .then(() => {
@@ -109,7 +111,11 @@ const App = () => {
 
   const searchUsers = () => {
     axios
-      .get(`http://localhost:5000/users/search?name=${searchTerm}`) //by using query parameter
+      .get(`http://localhost:5000/users/search?name=${searchTerm}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }) //by using query parameter
       .then((response) => setUsers(response.data))
       .catch((error) => {
         console.error("Error searching users:", error);
@@ -123,17 +129,24 @@ const App = () => {
 
   return (
     <Container maxWidth="lg">
-      <Typography variant="h4" textAlign={"center"} padding={5} gutterBottom>
-        User Management
-      </Typography>
-
-      <Box display="flex" justifyContent="center" mb={4}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        width="100%"
+        mb={4}
+      >
         <Button
           variant="contained"
-          color="secondary"
-          onClick={handleLogout}
-          sx={{ marginTop: 2 }} // Add margin top to space it out from other components
+          color="primary"
+          onClick={() => setOpenDialog(true)}
         >
+          Add New User
+        </Button>
+        <Typography variant="h4" textAlign={"center"} padding={2} gutterBottom>
+          User Management
+        </Typography>
+        <Button variant="contained" color="secondary" onClick={handleLogout}>
           Logout
         </Button>
       </Box>
@@ -143,16 +156,6 @@ const App = () => {
         setSearchTerm={setSearchTerm}
         searchUsers={searchUsers}
       />
-
-      <Box display="flex" justifyContent="center" mb={2}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setOpenDialog(true)}
-        >
-          Add New User
-        </Button>
-      </Box>
 
       <AddUserDialog
         openDialog={openDialog}
@@ -170,17 +173,19 @@ const App = () => {
         editUser={editUser}
       />
 
-      {loading ? (
-        <Typography variant="h6" color="textSecondary" align="center">
-          Loading...
-        </Typography>
-      ) : (
-        <UserList
-          users={users}
-          openEditDialogHandler={openEditDialogHandler}
-          deleteUser={deleteUser}
-        />
-      )}
+      <Box marginBottom={5}>
+        {loading ? (
+          <Typography variant="h6" color="textSecondary" align="center">
+            Loading...
+          </Typography>
+        ) : (
+          <UserList
+            users={users}
+            openEditDialogHandler={openEditDialogHandler}
+            deleteUser={deleteUser}
+          />
+        )}
+      </Box>
     </Container>
   );
 };
